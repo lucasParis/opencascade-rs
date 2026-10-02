@@ -447,6 +447,25 @@ impl Shape {
         self.inner.ShapeType().into()
     }
 
+    /// Volume of the shape (exact, from the B-rep), in model units cubed.
+    /// Only solids contribute; faces, wires and edges have zero volume.
+    pub fn volume(&self) -> f64 {
+        let mut props = ffi::g_prop::GProps_new();
+
+        let only_closed = false;
+        let skip_shared = false;
+        let use_triangulation = false;
+        ffi::b_rep_g_prop::BRepGProp::VolumeProperties(
+            &self.inner,
+            props.pin_mut(),
+            only_closed,
+            skip_shared,
+            use_triangulation,
+        );
+
+        props.Mass()
+    }
+
     #[must_use]
     pub fn fillet_edge(&self, radius: f64, edge: &Edge) -> Self {
         self.fillet_edges(radius, [edge])
