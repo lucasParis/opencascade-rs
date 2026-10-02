@@ -118,6 +118,9 @@ fn main() {
     build
         .cpp(true)
         .flag_if_supported("-std=c++11")
+        // MSVC: enable C++ unwind semantics for the bridge (OCCT itself is built with /EHa).
+        // Without it cl warns C4530 and locals are not destroyed while an OCCT exception unwinds.
+        .flag_if_supported("/EHsc")
         .define("_USE_MATH_DEFINES", "TRUE")
         .include(occt_config.include_dir)
         .include("include")
